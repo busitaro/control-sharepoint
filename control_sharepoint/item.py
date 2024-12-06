@@ -1,5 +1,6 @@
 import json
 import requests
+from os.path import basename
 
 from graph_auth import read_token
 from graph_auth import ApiError
@@ -15,7 +16,7 @@ class Item:
         site_id: str
             SharePointのサイトID
         path: str
-            ファイルまでのパス
+            ファイルorディレクトリまでのパス
         """
         for k, v in self.get_item(site_id, path).items():
             setattr(self, k, v)
@@ -29,7 +30,7 @@ class Item:
         site_id: str
             SharePointのサイトID
         path: str
-            ファイルまでのパス(ex. /General/Path/to/file)
+            ファイルorディレクトリまでのパス(ex. /General/Path/to/file)
         """
         # リクエスト先設定
         header = {"Authorization": f"Bearer {read_token()}"}
@@ -48,6 +49,10 @@ class Item:
         """
         ファイルをダウンロードする
 
+        Params
+        -------
+        dest_path: str
+            ダウンロード先のディレクトリパス
         """
         # リクエスト先設定
         header = {"Authorization": f"Bearer {read_token()}"}
@@ -63,3 +68,27 @@ class Item:
         # ファイルの保存
         with open(f"{dest_path}/{self.name}", "wb") as f:
             f.write(response._content)
+
+    def upload(self, file_path: str):
+        """
+        ファイルをアップロードする
+
+        Params
+        -------
+        file_path: str
+            アップロードするファイルのパス
+        """
+        # リクエスト先設定
+        header = {"Authorization": f"Bearer {read_token()}"}
+        url = f"https://graph.microsoft.com/v1.0/sites/{self.parentReference['siteId']}/drive/items/{self.id}:/{basename(file_path)}:/content"
+
+        # APIの実行
+        with open(file_path, "rb") as f:
+            response = requests.put(url, headers=header, data=f)
+
+        # レスポンスのチェック
+        if response.status_code not in [200, 201]:
+            print(response.status_code)
+            raise ApiError(response)
+
+        return json.loads(response._content.decode("utf-8"))
