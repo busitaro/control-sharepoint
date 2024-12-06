@@ -12,7 +12,7 @@ VERSION = 0.1
 
 INSTALL_REQUIRES = [
     "requests>=2.31.0",
-    "graph-auth>=0.12 @ git+https://github.com/busitaro/graph-auth.git",
+    "graph-auth @ git+https://github.com/busitaro/graph-auth.git",
 ]
 
 setup(
