@@ -49,6 +49,10 @@ class Item:
         """
         ファイルをダウンロードする
 
+        Params
+        -------
+        dest_path: str
+            ダウンロード先のディレクトリパス
         """
         # リクエスト先設定
         header = {"Authorization": f"Bearer {read_token()}"}
@@ -73,8 +77,6 @@ class Item:
         -------
         file_path: str
             アップロードするファイルのパス
-        dist_path: str
-            アップロード先ディレクトリのパス(ex. /General/Path/to/dist)
         """
         # リクエスト先設定
         header = {"Authorization": f"Bearer {read_token()}"}
